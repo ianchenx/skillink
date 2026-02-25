@@ -91,15 +91,23 @@ skillink agents                             # list configured agents
 
 ## Automate
 
-Add to `package.json` to auto-distribute on clone:
+Add `skillink` as a dev dependency to your project so teammates get skill symlinks automatically on `npm install`:
+
+```bash
+npm i -D skillink
+```
+
+Then add a `postinstall` script to your `package.json`:
 
 ```json
 {
   "scripts": {
-    "postinstall": "skillink sync --agent <agent1> <agent2>"
+    "postinstall": "skillink sync --agent claude-code opencode"
   }
 }
 ```
+
+Now every `npm install` will automatically distribute skills to all specified agents.
 
 Symlinks are generated artifacts — don't commit them. Add to `.gitignore`:
 
