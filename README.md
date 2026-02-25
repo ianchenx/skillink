@@ -3,6 +3,9 @@
   <p align="center">
     One skill source, every AI agent — project-level skill distribution CLI
   </p>
+  <p align="center">
+    <a href="https://www.npmjs.com/package/skillink"><img src="https://img.shields.io/npm/v/skillink.svg" alt="npm version"></a>
+  </p>
 </p>
 
 ---
