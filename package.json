@@ -1,0 +1,49 @@
+{
+  "name": "skillink",
+  "version": "0.1.0",
+  "description": "Symlink skills from .agents/skills/ to all AI coding agents",
+  "type": "module",
+  "bin": {
+    "skillink": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "bun run src/cli.ts",
+    "build": "bun build src/cli.ts --outdir dist --target node --format esm && mv dist/cli.js dist/cli.mjs && chmod +x dist/cli.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "bun run build",
+    "release:patch": "bun run build && npm version patch && npm publish && git push --follow-tags",
+    "release:minor": "bun run build && npm version minor && npm publish && git push --follow-tags"
+  },
+  "keywords": [
+    "skills",
+    "symlink",
+    "ai-agents",
+    "claude-code",
+    "opencode",
+    "agent-skills"
+  ],
+  "repository": "github:ianchenx/skillink.git",
+  "author": "Ian <https://github.com/ianchenx>",
+  "homepage": "https://github.com/ianchenx/skillink#readme",
+  "bugs": {
+    "url": "https://github.com/ianchenx/skillink/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^22",
+    "typescript": "^5",
+    "vitest": "^4"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.0.1",
+    "picocolors": "^1.1.1"
+  }
+}
