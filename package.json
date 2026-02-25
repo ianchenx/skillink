@@ -1,6 +1,6 @@
 {
   "name": "skillink",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "One skill source, every AI agent — project-level skill distribution CLI",
   "type": "module",
   "bin": {
