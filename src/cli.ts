@@ -2,11 +2,13 @@
 
 import pc from 'picocolors';
 import * as p from '@clack/prompts';
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { agents, getTargetAgents } from './agents.ts';
 import { syncSkills, cleanSkills, getStatus, type SyncOptions } from './sync.ts';
+
+const CANONICAL_SOURCE = '.agents/skills';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -174,11 +176,17 @@ async function resolveAgents(args: ParsedArgs): Promise<string[] | null> {
 }
 
 async function cmdSync(args: ParsedArgs): Promise<void> {
+  const root = process.cwd();
+  if (!existsSync(join(root, CANONICAL_SOURCE))) {
+    p.log.error(`${pc.bold(CANONICAL_SOURCE + '/')} not found in current project.`);
+    p.log.info('Create the directory and add your skills first, then re-run.');
+    return;
+  }
+
   const selected = await resolveAgents(args);
   if (!selected) return;
 
   const options = buildSyncOptions(selected, args.dryRun);
-  const root = process.cwd();
 
   if (args.dryRun) {
     console.log(pc.yellow('  Dry run — no changes will be made\n'));
@@ -208,39 +216,34 @@ function cmdStatus(args: ParsedArgs): void {
   const options = buildSyncOptions(agentNames, false);
   const root = process.cwd();
 
-  try {
-    const statuses = getStatus(root, options);
+  if (!existsSync(join(root, CANONICAL_SOURCE))) {
+    p.log.warn(`${pc.bold(CANONICAL_SOURCE + '/')} not found in current project.`);
+    return;
+  }
 
-    console.log(`  ${pc.bold('Source:')} .agents/skills/`);
-    console.log();
+  const statuses = getStatus(root, options);
 
-    for (const status of statuses) {
-      const total =
-        status.linked.length + status.unlinked.length + status.wrong.length;
-      if (total === 0 && status.unlinked.length === 0) continue;
+  console.log(`  ${pc.bold('Source:')} .agents/skills/`);
+  console.log();
 
-      const indicator =
-        status.unlinked.length === 0
-          ? pc.green('●')
-          : status.linked.length > 0
-            ? pc.yellow('◐')
-            : pc.dim('○');
+  for (const status of statuses) {
+    const total =
+      status.linked.length + status.unlinked.length + status.wrong.length;
+    if (total === 0 && status.unlinked.length === 0) continue;
 
-      console.log(
-        `  ${indicator} ${pc.bold(status.agent)} ${pc.dim(`(${status.skillsDir})`)}`,
-      );
-      console.log(
-        `    ${pc.green(`${status.linked.length} linked`)}${status.unlinked.length > 0 ? `, ${pc.yellow(`${status.unlinked.length} unlinked`)}` : ''}${status.wrong.length > 0 ? `, ${pc.red(`${status.wrong.length} wrong`)}` : ''}`,
-      );
-    }
-  } catch (e) {
-    if (e instanceof Error && e.message.includes('.agents/skills')) {
-      console.log(
-        pc.yellow('  No .agents/skills/ directory found in current project.'),
-      );
-    } else {
-      throw e;
-    }
+    const indicator =
+      status.unlinked.length === 0
+        ? pc.green('●')
+        : status.linked.length > 0
+          ? pc.yellow('◐')
+          : pc.dim('○');
+
+    console.log(
+      `  ${indicator} ${pc.bold(status.agent)} ${pc.dim(`(${status.skillsDir})`)}`,
+    );
+    console.log(
+      `    ${pc.green(`${status.linked.length} linked`)}${status.unlinked.length > 0 ? `, ${pc.yellow(`${status.unlinked.length} unlinked`)}` : ''}${status.wrong.length > 0 ? `, ${pc.red(`${status.wrong.length} wrong`)}` : ''}`,
+    );
   }
 }
 
