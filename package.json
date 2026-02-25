@@ -1,7 +1,7 @@
 {
   "name": "skillink",
-  "version": "0.1.0",
-  "description": "Symlink skills from .agents/skills/ to all AI coding agents",
+  "version": "0.0.1",
+  "description": "One skill source, every AI agent — project-level skill distribution CLI",
   "type": "module",
   "bin": {
     "skillink": "./dist/cli.mjs"
