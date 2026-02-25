@@ -2,10 +2,26 @@
 
 import pc from 'picocolors';
 import * as p from '@clack/prompts';
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { agents, getTargetAgents } from './agents.ts';
 import { syncSkills, cleanSkills, getStatus, type SyncOptions } from './sync.ts';
 
-const VERSION = '0.1.0';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function getVersion(): string {
+  try {
+    const pkg = JSON.parse(
+      readFileSync(join(__dirname, '..', 'package.json'), 'utf-8'),
+    );
+    return pkg.version;
+  } catch {
+    return '0.0.0';
+  }
+}
+
+const VERSION = getVersion();
 
 function showHelp(): void {
   console.log(`
@@ -21,17 +37,17 @@ ${pc.bold('Commands:')}
   help              Show this help
 
 ${pc.bold('Options:')}
-  --agent <name>    Specify agent (can be repeated, skips prompt)
+  --agent <names>   Specify agents (space-separated, skips prompt)
   --dry-run         Preview changes without applying
   -y, --yes         Skip prompts, sync all agents
   --version, -v     Show version
 
 ${pc.bold('Examples:')}
-  ${pc.dim('$')} skillink sync                        ${pc.dim('# interactive: select agents')}
-  ${pc.dim('$')} skillink sync --agent claude-code     ${pc.dim('# non-interactive: claude only')}
-  ${pc.dim('$')} skillink sync -y                      ${pc.dim('# non-interactive: all agents')}
-  ${pc.dim('$')} skillink status                       ${pc.dim('# check current state')}
-  ${pc.dim('$')} skillink clean                        ${pc.dim('# remove all symlinks')}
+  ${pc.dim('$')} skillink sync                              ${pc.dim('# interactive: select agents')}
+  ${pc.dim('$')} skillink sync --agent claude-code opencode  ${pc.dim('# non-interactive: specific agents')}
+  ${pc.dim('$')} skillink sync -y                            ${pc.dim('# non-interactive: all agents')}
+  ${pc.dim('$')} skillink status                             ${pc.dim('# check current state')}
+  ${pc.dim('$')} skillink clean                              ${pc.dim('# remove all symlinks')}
 
 ${pc.dim('Source: .agents/skills/')}
 `);
@@ -54,8 +70,11 @@ function parseArgs(argv: string[]): ParsedArgs {
   for (let i = 1; i < args.length; i++) {
     const arg = args[i];
     if (arg === '--agent' || arg === '-a') {
-      i++;
-      if (i < args.length) agentFilters.push(args[i]);
+      // Consume all following non-flag tokens as agent names
+      while (i + 1 < args.length && !args[i + 1].startsWith('-')) {
+        i++;
+        agentFilters.push(args[i]);
+      }
     } else if (arg === '--dry-run') {
       dryRun = true;
     } else if (arg === '-y' || arg === '--yes') {
