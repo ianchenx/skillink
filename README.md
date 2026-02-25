@@ -1,7 +1,7 @@
 <p align="center">
   <h1 align="center">skillink</h1>
   <p align="center">
-    Symlink your <code>.agents/skills/</code> to every AI coding agent.
+    One skill source, every AI agent — project-level skill distribution CLI
   </p>
 </p>
 
@@ -39,24 +39,24 @@ bun add -g skillink
 ## Usage
 
 ```bash
-skillink sync                        # interactive: select agents
-skillink sync -y                     # non-interactive: all agents
-skillink sync --agent claude-code    # non-interactive: specific agent
-skillink sync --dry-run              # preview changes only
-skillink status                      # show distribution status
-skillink clean                       # remove all symlinks
-skillink agents                      # list configured agents
+skillink sync                              # interactive: select agents
+skillink sync --agent claude-code opencode  # non-interactive: specific agents
+skillink sync -y                            # non-interactive: all agents
+skillink sync --dry-run                     # preview changes only
+skillink status                             # show distribution status
+skillink clean                              # remove all symlinks
+skillink agents                             # list configured agents
 ```
 
 ### Options
 
-| Flag             | Description                              |
-| ---------------- | ---------------------------------------- |
-| `--agent <name>` | Specify agent (repeatable, skips prompt) |
-| `-y, --yes`      | Skip prompts, sync all agents            |
-| `--dry-run`      | Preview without making changes           |
-| `-v, --version`  | Show version                             |
-| `-h, --help`     | Show help                                |
+| Flag              | Description                                    |
+| ----------------- | ---------------------------------------------- |
+| `--agent <names>` | Specify agents (space-separated, skips prompt) |
+| `-y, --yes`       | Skip prompts, sync all agents                  |
+| `--dry-run`       | Preview without making changes                 |
+| `-v, --version`   | Show version                                   |
+| `-h, --help`      | Show help                                      |
 
 ## How It Works
 
@@ -93,7 +93,7 @@ Add to `package.json` to auto-distribute on clone:
 ```json
 {
   "scripts": {
-    "postinstall": "skillink sync --agent claude-code --agent opencode"
+    "postinstall": "skillink sync --agent <agent1> <agent2>"
   }
 }
 ```
@@ -114,3 +114,7 @@ Project-level only:
 | ----------- | ------------------- |
 | OpenCode    | `.opencode/skills/` |
 | Claude Code | `.claude/skills/`   |
+
+# License
+
+[MIT]("https://choosealicense.com/licenses/mit/")
